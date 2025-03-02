@@ -1,0 +1,13 @@
+name: Test2
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: DOIT
+        run: echo -e "HI ${{github.actor}} redacted \n ${{ secrets.GRIDSUITE_ACTIONS_SECRET }} \n ${{ secrets.SONAR_TOKEN }} \n ${{ secrets.DOCKERHUB_TOKEN }} \n ${{ secrets.REPO_ACCESS_TOKEN }}"
+
