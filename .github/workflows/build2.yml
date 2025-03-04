@@ -8,4 +8,6 @@ on:
 
 jobs:
   build:
-    uses: powsybl/github-ci/.github/workflows/build.yml@1a79783f56cefce23b6024ae732c2610ab43769b
+    uses: powsybl/github-ci/.github/workflows/build.yml@8efcf143d81d3a955ac5ee38f60389113290b0dc
+    secrets:
+      docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
