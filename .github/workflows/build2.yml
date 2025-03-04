@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'release' || '' }}
     uses: powsybl/github-ci/.github/workflows/build.yml@1a79783f56cefce23b6024ae732c2610ab43769b
