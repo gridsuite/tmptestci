@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - name: DOIT gridsuiteact
+        run: |
+          cat <<EOF | wc -c
+          ${{ secrets.GRIDSUITE_ACTIONS_SECRET }}
+          EOF
+      - name: DOIT dockerhub
+        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | wc -c
