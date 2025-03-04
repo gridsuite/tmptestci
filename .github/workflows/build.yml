@@ -18,3 +18,7 @@ jobs:
       - name: DOIT dockerhub
         if: github.ref == 'refs/heads/main'
         run: echo ${{ secrets.DOCKERHUB_TOKEN }} | wc -c
+
+      - name: DOIT dockerhub
+        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | wc -c
+
