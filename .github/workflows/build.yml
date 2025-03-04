@@ -9,12 +9,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: release
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'release' || '' }}
     steps:
       - name: DOIT gridsuiteact
-        run: |
-          cat <<EOF | wc -c
-          ${{ secrets.GRIDSUITE_ACTIONS_SECRET }}
-          EOF
+        run: echo hello
+
       - name: DOIT dockerhub
+        if: github.ref == 'refs/heads/main'
         run: echo ${{ secrets.DOCKERHUB_TOKEN }} | wc -c
