@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'release' || '' }}
     steps:
       - name: DOIT gridsuiteact
         run: echo hello
