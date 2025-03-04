@@ -1,0 +1,13 @@
+name: CI reusable
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+
+jobs:
+  build:
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'release' || '' }}
+    uses: powsybl/github-ci/.github/workflows/build.yml@8fe94768950abdec665c261dc6fe4a8af5457d7a
