@@ -1,0 +1,33 @@
+name: Test3
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    steps:
+      # don't allow to disable this check, and for security only succeed if everything goes perfectly and outputs "true"
+      - name: Check Actor Permission
+        env:
+          # Need to properly pass permission all the way down to jq as data to avoid script injections
+          PERMISSION: "maintain"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "checking permission=$PERMISSION on repo=$GITHUB_REPOSITORY for user=$GITHUB_ACTOR"
+          # no need to escape GITHUB_REPOSITORY and GITHUB_ACTOR because github
+          # names can only contain ASCII letters, digits, and the characters ., # -, and _.
+          # permission: legacy, is actually a role (one per user) and doesn't
+          #   have "maintain" role, only ["none", "read", "write", "admin"]
+          # role_name: one per user, new standard roles, custom roles, "" and
+          #   "push" and "pull" instead of "none" and "read" and "write": "",
+          #   "read", "triage", "write", "maintain", "admin" and also non
+          #   standard custom roles
+          # user.permissions: boolean status only for each standard permissions "pull", "triage", "push", "maintain", "admin"
+          # Not using gh --jq gojq because we can't access variables
+          allowed=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$GITHUB_ACTOR/permission" | jq --arg PERMISSION "$PERMISSION" '.user.permissions[$PERMISSION]')
+          echo "got |$allowed|"
+          [[ "$allowed" == "true" ]] || exit 1
+
+      - name: DOIT
+        run: echo "HI ${{github.actor}}"
