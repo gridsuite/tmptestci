@@ -10,7 +10,6 @@ on:
 jobs:
   run-release:
     runs-on: ubuntu-latest
-    environment: release
     steps:
       - name: DOIT
         run: echo -e "HI ${{github.actor}}"

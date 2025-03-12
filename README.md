@@ -1,3 +1,4 @@
 # tmptestci
 azd
+azd
 b
