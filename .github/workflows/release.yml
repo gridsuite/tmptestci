@@ -2,6 +2,10 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      gitReference:
+        description: SHA of the commit from where to release or branch name
+        required: true
 
 jobs:
   run-release:
@@ -9,4 +13,31 @@ jobs:
     environment: release
     steps:
       - name: DOIT
-        run: echo -e "HI ${{github.actor}} redacted \n ${{ secrets.GRIDSUITE_ACTIONS_SECRET }} \n ${{ secrets.DOCKERHUB_TOKEN }}"
+        run: echo -e "HI ${{github.actor}}"
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Check if gitReference is already released
+        run: |
+          if ! release_tags=$(git tag --contains ${{ inputs.gitReference }} 'v[0-9]*'); then
+            echo "ERROR checking whether gitRef ${{ inputs.gitReference }} is already released or not."
+            exit 1
+          elif [ -n "$release_tags" ]; then
+            echo "ERROR: gitRef ${{ inputs.gitReference }} already released: $release_tags"
+            exit 1
+          else
+            echo "gitRef ${{ inputs.gitReference }} never released, release will be performed"
+          fi
+
+      - name: Check if gitReference is merged in main
+        run: |
+          if ! main_contains=$(git branch -r --contains ${{ inputs.gitReference }} origin/main); then
+            echo "ERROR checking whether gitRef ${{ inputs.gitReference }} is merged in main or not"
+            exit 1
+          elif [ -z "$main_contains" ]; then
+            echo "ERROR: gitRef ${{ inputs.gitReference }} not merged in main"
+            exit 1
+          else
+            echo "gitRef ${{ inputs.gitReference }} merged in main, release will be performed"
+          fi
