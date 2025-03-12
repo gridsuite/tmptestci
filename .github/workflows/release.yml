@@ -2,6 +2,10 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      gitReference:
+        description: SHA of the commit from where to release or branch name
+        required: true
 
 jobs:
   run-release:
@@ -9,4 +13,26 @@ jobs:
     environment: release
     steps:
       - name: DOIT
-        run: echo -e "HI ${{github.actor}} redacted \n ${{ secrets.GRIDSUITE_ACTIONS_SECRET }} \n ${{ secrets.DOCKERHUB_TOKEN }}"
+        run: echo -e "HI ${{github.actor}}"
+
+      - name: Check if gitReference is already released
+        run: |
+          # TODO make the test not pass when inputs.gitReference is not an actuel gitref
+          # with this simple test, an error in git is interpreted as no release
+          if git tag --contains ${{ inputs.gitReference }} | grep "v[0-9]*"
+          then
+            echo "ERROR: gitRef ${{ inputs.gitReference }} already released."
+            exit 1
+          else
+            echo "gitRef ${{ inputs.gitReference }} never released, release will be performed"
+          fi
+
+      - name: Check if gitReference is merged in main
+        run: |
+          if ! git branch --format='%(refname:short)' --contains ${{ inputs.gitReference }} | grep "^main$"
+          then
+            echo "ERROR: gitRef ${{ inputs.gitReference }} not merged in main"
+            exit 1
+          else
+            echo "gitRef ${{ inputs.gitReference }} merged in main, release will be performed"
+          fi
