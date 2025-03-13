@@ -15,31 +15,29 @@ jobs:
       - name: DOIT
         run: echo -e "HI ${{github.actor}}"
 
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          # required
+          app-id: ${{ vars.GRIDSUITE_ACTIONS_APPID }}
+          private-key: ${{ secrets.VERSIONBUMP_GHAPP_PRIVATE_KEY}}
+
+      - name: Get GitHub App User ID
+        id: get-user-id
+        run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+      - run: |
+          git config --global user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+          git config --global user.email '${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com'
+
       - name: Checkout sources
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
 
-      - name: Check if gitReference is already released
-        run: |
-          if ! release_tags=$(git tag --contains ${{ inputs.gitReference }} 'v[0-9]*'); then
-            echo "ERROR checking whether gitRef ${{ inputs.gitReference }} is already released or not."
-            exit 1
-          elif [ -n "$release_tags" ]; then
-            echo "ERROR: gitRef ${{ inputs.gitReference }} already released: $release_tags"
-            exit 1
-          else
-            echo "gitRef ${{ inputs.gitReference }} never released, release will be performed"
-          fi
+      - run: |
+          git commit -m "Auto-generated changes" --allow-empty
+          git push
 
-      - name: Check if gitReference is merged in main
-        run: |
-          if ! main_contains=$(git branch -r --contains ${{ inputs.gitReference }} origin/main); then
-            echo "ERROR checking whether gitRef ${{ inputs.gitReference }} is merged in main or not"
-            exit 1
-          elif [ -z "$main_contains" ]; then
-            echo "ERROR: gitRef ${{ inputs.gitReference }} not merged in main"
-            exit 1
-          else
-            echo "gitRef ${{ inputs.gitReference }} merged in main, release will be performed"
-          fi
