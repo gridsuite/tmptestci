@@ -37,8 +37,6 @@ jobs:
 
       - name: test
         run: |
-          git fetch
-          git diff
-          git diff origin/tmpxxx # ensure we have the right diff in the created commit
           git push origin origin/tmpxxx:main
+          git push origin :tmpxxx
 
