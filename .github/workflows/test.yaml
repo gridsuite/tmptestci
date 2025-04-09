@@ -22,6 +22,9 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
 
       - name: test
+        run: git push origin main:tmpxxx
+
+      - name: test
         run: date >> dates.txt
 
       - name: verified-bot-commit
@@ -30,7 +33,12 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           files: dates.txt
           message: "add date"
-          ref: main
+          ref: tmpxxx
 
-
+      - name: test
+        run: |
+          git fetch
+          git diff
+          git diff origin/tmpxxx # ensure we have the right diff in the created commit
+          git push origin origin/tmpxxx:main
 
