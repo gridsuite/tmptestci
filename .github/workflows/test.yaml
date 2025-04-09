@@ -37,9 +37,6 @@ jobs:
 
       - name: test
         run: |
-          git status
-          git diff
-          git branch -a
-          git push origin origin/tmpxxx:main
+          git push
           git push origin :tmpxxx
 
