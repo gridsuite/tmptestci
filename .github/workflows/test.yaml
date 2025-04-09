@@ -30,7 +30,6 @@ jobs:
       - name: verified-bot-commit
         uses: IAreKyleW00t/verified-bot-commit@27699d08b34a5440e6b4385c6ea3651602d26bcc # v1.3.3
         with:
-          token: ${{ steps.app-token.outputs.token }}
           files: dates.txt
           message: "add date"
           ref: tmpxxx
